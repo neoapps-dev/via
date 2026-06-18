@@ -1,6 +1,10 @@
 CC ?= gcc
+STATIC ?= 0
 override CFLAGS += -std=c11 -Wall -Wextra -pedantic -g -D_POSIX_C_SOURCE=200809L -D_DEFAULT_SOURCE $(shell pkg-config --cflags ncurses 2>/dev/null)
 LDFLAGS = $(shell pkg-config --libs ncurses 2>/dev/null || echo '-lncurses -ltinfo')
+ifeq ($(STATIC), 1)
+    LDFLAGS += -static
+endif
 SRCDIR = src
 OBJDIR = obj
 SRCS = $(wildcard $(SRCDIR)/*.c)
