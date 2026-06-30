@@ -3,6 +3,7 @@
 #include <curses.h>
 #include "render.h"
 #include "theme.h"
+#include "syntax.h"
 static int scr_rows;
 static int scr_cols;
 void render_init(void)
@@ -34,7 +35,7 @@ void render_resize(void)
     scr_cols = COLS;
 }
 
-static void render_line(Editor *e, int screen_row, int buf_row)
+static void render_line(Editor *e, int screen_row, int buf_row, SynState *syn_state)
 {
     if (buf_row < 0 || buf_row >= buf_count(e->buf)) {
         move(screen_row, 0);
@@ -63,28 +64,47 @@ static void render_line(Editor *e, int screen_row, int buf_row)
         if (v1 > v2) { int t = v1; v1 = v2; v2 = t; }
         in_visual = (buf_row >= v1 && buf_row <= v2);
     }
-    int pair;
-    int attr;
+    int base_pair;
+    int base_attr;
     if (in_visual) {
-        pair = theme_pair(VIA_SELECTION);
-        attr = theme_attr(VIA_SELECTION);
+        base_pair = theme_pair(VIA_SELECTION);
+        base_attr = theme_attr(VIA_SELECTION);
     } else if (cursor_line) {
-        pair = theme_pair(VIA_CURSOR_LINE);
-        attr = theme_attr(VIA_CURSOR_LINE);
+        base_pair = theme_pair(VIA_CURSOR_LINE);
+        base_attr = theme_attr(VIA_CURSOR_LINE);
     } else {
-        pair = theme_pair(VIA_NORMAL);
-        attr = theme_attr(VIA_NORMAL);
+        base_pair = theme_pair(VIA_NORMAL);
+        base_attr = theme_attr(VIA_NORMAL);
     }
-    attrset(attr | pair);
+    attrset(base_attr | base_pair);
+
+    bool use_syntax = !in_visual && !cursor_line &&
+                      e->opts.syntax && e->filetype && e->filetype[0];
+    SynSpan spans[SYN_SPANS_MAX];
+    int nspans = 0;
+    if (use_syntax)
+        nspans = syn_highlight(line, len, e->filetype, spans, SYN_SPANS_MAX, syn_state);
+
     int x = num_width;
-    for (int i = 0; i < len && x < scr_cols; i++) {
+    int span_i = 0;
+    for (int i = 0; i < len && x < scr_cols; ) {
+        if (use_syntax) {
+            while (span_i < nspans && i >= spans[span_i].offset + spans[span_i].length)
+                span_i++;
+            if (span_i < nspans && i >= spans[span_i].offset) {
+                int elem = spans[span_i].elem;
+                attrset(theme_attr(elem) | theme_pair(elem));
+            } else {
+                attrset(base_attr | base_pair);
+            }
+        }
         if (line[i] == '\t') {
             int stop = e->tabstop - (x - num_width) % e->tabstop;
             for (int j = 0; j < stop && x < scr_cols; j++) {
                 mvaddch(screen_row, x, ' ');
                 x++;
             }
-        } else if (line[i] < 32) {
+        } else if ((unsigned char)line[i] < 32) {
             mvaddch(screen_row, x, '^');
             x++;
             if (x < scr_cols) {
@@ -95,6 +115,7 @@ static void render_line(Editor *e, int screen_row, int buf_row)
             mvaddch(screen_row, x, line[i]);
             x++;
         }
+        i++;
     }
     move(screen_row, x);
     clrtoeol();
@@ -194,9 +215,10 @@ void render_draw(Editor *e)
     scr_cols = COLS;
     ed_scroll(e);
     int text_rows = scr_rows - 1;
+    SynState syn_state = {0};
     for (int i = 0; i < text_rows; i++) {
         int buf_row = e->top_row + i;
-        render_line(e, i, buf_row);
+        render_line(e, i, buf_row, &syn_state);
     }
     render_status(e);
     int cursor_row = e->row - e->top_row;

@@ -11,6 +11,7 @@ typedef struct {
     bool incsearch;
     bool smartcase;
     bool ignorecase;
+    bool syntax;
 } Options;
 extern Options via_opts;
 void opt_init(void);

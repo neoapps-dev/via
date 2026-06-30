@@ -1,6 +1,6 @@
 #ifndef VIA_THEME_H
 #define VIA_THEME_H
-#define VIA_ELEMS 12
+#define VIA_ELEMS 19
 typedef struct {
     short fg[VIA_ELEMS];
     short bg[VIA_ELEMS];
@@ -19,6 +19,13 @@ enum {
     VIA_SELECTION,
     VIA_SEARCH,
     VIA_EOL,
+    VIA_KEYWORD,
+    VIA_STRING,
+    VIA_COMMENT,
+    VIA_NUMBER,
+    VIA_TYPE,
+    VIA_PREPROC,
+    VIA_OPERATOR,
 };
 
 extern Theme via_theme;

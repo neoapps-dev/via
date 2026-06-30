@@ -13,6 +13,7 @@ void opt_init(void)
     via_opts.incsearch = false;
     via_opts.smartcase = true;
     via_opts.ignorecase = false;
+    via_opts.syntax = true;
 }
 
 static int opt_set_int(const char *name, const char *value)
@@ -38,13 +39,14 @@ static int opt_set_bool(const char *name, const char *value)
     if (strcmp(name, "incsearch") == 0) { via_opts.incsearch = v; return 0; }
     if (strcmp(name, "smartcase") == 0) { via_opts.smartcase = v; return 0; }
     if (strcmp(name, "ignorecase") == 0) { via_opts.ignorecase = v; return 0; }
+    if (strcmp(name, "syntax") == 0) { via_opts.syntax = v; return 0; }
     return -1;
 }
 
 int opt_set(const char *name, const char *value)
 {
     const char *nums[] = {"tabstop", "shiftwidth", "scrolloff", NULL};
-    const char *bools[] = {"number", "list", "hlsearch", "incsearch", "smartcase", "ignorecase", NULL};
+    const char *bools[] = {"number", "list", "hlsearch", "incsearch", "smartcase", "ignorecase", "syntax", NULL};
     for (int i = 0; nums[i]; i++)
         if (strcmp(name, nums[i]) == 0) return opt_set_int(name, value);
     for (int i = 0; bools[i]; i++)

@@ -9,6 +9,7 @@
 #include "render.h"
 #include "input.h"
 #include "ex.h"
+#include "syntax.h"
 Editor *ed_new(void)
 {
     Editor *e = calloc(1, sizeof(Editor));
@@ -25,6 +26,8 @@ Editor *ed_new(void)
     e->undo_save_pos = 0;
     e->undolevels = 1000;
     e->last_find_char = 0;
+    e->filetype = strdup("");
+    e->opts.syntax = true;
     opt_init();
     via_theme = via_theme;
     theme_default();
@@ -34,6 +37,7 @@ Editor *ed_new(void)
 void ed_free(Editor *e)
 {
     if (e->filename) free(e->filename);
+    if (e->filetype) free(e->filetype);
     for (int i = 0; i < 10; i++)
         if (e->regs[i].text) free(e->regs[i].text);
     for (int i = 0; i < 26; i++)
@@ -98,6 +102,8 @@ void ed_open(Editor *e, const char *path)
 {
     if (e->filename) free(e->filename);
     e->filename = strdup(path);
+    if (e->filetype) free(e->filetype);
+    e->filetype = strdup(syn_detect(path));
     buf_free(e->buf);
     e->buf = buf_new();
     if (buf_load(e->buf, path) == 0) {

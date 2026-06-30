@@ -126,9 +126,10 @@ void ex_cmd_edit(Editor *e, const char *arg)
 void ex_cmd_set(Editor *e, const char *arg)
 {
     if (!arg || *arg == '\0') {
-        ed_msg(e, "number=%s list=%s tabstop=%d shiftwidth=%d scrolloff=%d",
+        ed_msg(e, "number=%s list=%s syntax=%s tabstop=%d shiftwidth=%d scrolloff=%d",
                e->opts.number ? "true" : "false",
                e->opts.list ? "true" : "false",
+               e->opts.syntax ? "true" : "false",
                e->opts.tabstop, e->opts.shiftwidth, e->opts.scrolloff);
         return;
     }
@@ -160,6 +161,10 @@ void ex_cmd_set(Editor *e, const char *arg)
         e->show_list = !e->show_list; via_opts.list = e->show_list;
     } else if (strcmp(name, "nolist") == 0) {
         e->show_list = false; via_opts.list = false;
+    } else if (strcmp(name, "syntax") == 0) {
+        e->opts.syntax = !e->opts.syntax; via_opts.syntax = e->opts.syntax;
+    } else if (strcmp(name, "nosyntax") == 0) {
+        e->opts.syntax = false; via_opts.syntax = false;
     } else {
         ed_msg(e, "Unknown option: %s", name);
     }
@@ -243,7 +248,9 @@ static int elem_from_name(const char *name)
         "normal", "insert", "visual", "status",
         "status-insert", "status-visual", "cmdline",
         "linenum", "cursor-line", "selection",
-        "search", "eol"
+        "search", "eol",
+        "keyword", "string", "comment", "number",
+        "type", "preproc", "operator"
     };
     for (int i = 0; i < VIA_ELEMS; i++)
         if (strcmp(name, names[i]) == 0) return i;

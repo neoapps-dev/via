@@ -51,6 +51,27 @@ void theme_default(void)
     via_theme.fg[VIA_EOL] = COLOR_WHITE;
     via_theme.bg[VIA_EOL] = COLOR_BLACK;
     via_theme.attr[VIA_EOL] = 0;
+    via_theme.fg[VIA_KEYWORD] = COLOR_YELLOW;
+    via_theme.bg[VIA_KEYWORD] = COLOR_BLACK;
+    via_theme.attr[VIA_KEYWORD] = A_BOLD;
+    via_theme.fg[VIA_STRING] = COLOR_GREEN;
+    via_theme.bg[VIA_STRING] = COLOR_BLACK;
+    via_theme.attr[VIA_STRING] = 0;
+    via_theme.fg[VIA_COMMENT] = COLOR_CYAN;
+    via_theme.bg[VIA_COMMENT] = COLOR_BLACK;
+    via_theme.attr[VIA_COMMENT] = 0;
+    via_theme.fg[VIA_NUMBER] = COLOR_MAGENTA;
+    via_theme.bg[VIA_NUMBER] = COLOR_BLACK;
+    via_theme.attr[VIA_NUMBER] = 0;
+    via_theme.fg[VIA_TYPE] = COLOR_YELLOW;
+    via_theme.bg[VIA_TYPE] = COLOR_BLACK;
+    via_theme.attr[VIA_TYPE] = 0;
+    via_theme.fg[VIA_PREPROC] = COLOR_MAGENTA;
+    via_theme.bg[VIA_PREPROC] = COLOR_BLACK;
+    via_theme.attr[VIA_PREPROC] = A_BOLD;
+    via_theme.fg[VIA_OPERATOR] = COLOR_WHITE;
+    via_theme.bg[VIA_OPERATOR] = COLOR_BLACK;
+    via_theme.attr[VIA_OPERATOR] = 0;
 }
 
 void theme_init(void)

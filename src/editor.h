@@ -46,6 +46,7 @@ typedef struct {
 typedef struct Editor {
     Buffer *buf;
     char *filename;
+    char *filetype;
     bool modified;
     int row, col;
     int top_row, left_col;
